@@ -1,0 +1,81 @@
+from sqlalchemy import Table, Column, Integer, String, MetaData
+from sqlalchemy.orm import sessionmaker
+from app.main import engine
+
+# Define metadata and users table
+metadata = MetaData()
+
+users_table = Table(
+    "users",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("name", String),
+    Column("email", String, unique=True),
+)
+
+# Create the table in the database
+metadata.create_all(engine)
+
+# Create a session factory
+SessionLocal = sessionmaker(bind=engine)
+
+
+def add_userdata(user: dict):
+    session = SessionLocal()
+  GNU nano 7.2                                                             services.py                                                                      from sqlalchemy import Table, Column, Integer, String, MetaData
+from sqlalchemy.orm import sessionmaker
+from app.main import engine
+
+# Define metadata and users table
+metadata = MetaData()
+
+users_table = Table(
+    "users",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("name", String),
+    Column("email", String, unique=True),
+)
+
+# Create the table in the database
+metadata.create_all(engine)
+
+# Create a session factory
+SessionLocal = sessionmaker(bind=engine)
+
+
+def add_userdata(user: dict):
+    session = SessionLocal()
+    try:
+        ins = users_table.insert().values(name=user["name"], email=user["email"])
+        session.execute(ins)
+        session.commit()
+    finally:
+        session.close()
+
+
+def read_usersdata():
+    session = SessionLocal()
+    try:
+        result = session.execute(users_table.select()).fetchall()
+        return {"users": [dict(row) for row in result]}
+    finally:
+        session.close()
+
+
+^G Help          ^O Write Out     ^W Where Is      ^K Cut           ^T Execute       ^C Location      M-U Undo         M-A Set Mark     M-] To Bracket
+^X Exit          ^R Read File     ^\ Replace       ^U Paste         ^J Justify       ^/ Go To Line    M-E Redo         M-6 Copy         ^Q Where Was    try:
+        ins = users_table.insert().values(name=user["name"], email=user["email"])
+        session.execute(ins)
+        session.commit()
+    finally:
+        session.close()
+
+
+def read_usersdata():
+    session = SessionLocal()
+    try:
+        result = session.execute(users_table.select()).fetchall()
+        return {"users": [dict(row) for row in result]}
+    finally:
+        session.close()

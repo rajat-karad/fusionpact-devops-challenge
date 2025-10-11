@@ -1,37 +1,24 @@
-import os
-import json
-from pathlib import Path
+from .database import SessionLocal, engine
+from .models import User
+from sqlalchemy.exc import IntegrityError
 
-BASE_DIR = Path(__file__).resolve().parent
-datafolder = os.path.join(BASE_DIR, "data")
-datasource = os.path.join(datafolder, "users.json")
+# Create tables
+User.metadata.create_all(bind=engine)
 
-def check_dataset_exists():
-    if not os.path.exists(datafolder):
-        os.mkdir(datafolder)
-    if not os.path.exists(datasource):
-        with open(datasource, "w") as f:
-            f.write("")
-            
-            
+def add_userdata(user_dict: dict):
+    db = SessionLocal()
+    try:
+        db_user = User(**user_dict)
+        db.add(db_user)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+    finally:
+        db.close()
+
 def read_usersdata():
-    check_dataset_exists()
-    with open(datasource, "r") as f:
-        content = f.read()
-        if content == "":
-            content = '{"data": []}'
-        users = json.loads(content)
-    return users
+    db = SessionLocal()
+    users = db.query(User).all()
+    db.close()
+    return {"data": [{"id": u.id, "name": u.name, "email": u.email} for u in users]}
 
-
-def add_userdata(user: dict):
-    users = read_usersdata()
-
-    with open(datasource, "w") as f:
-        if "data" in users:
-            users["data"].append(user)
-        else:
-            users["data"] = [user]
-
-        data = json.dumps(users, indent=2)
-        f.write(data)
