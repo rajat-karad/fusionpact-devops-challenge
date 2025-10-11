@@ -51,4 +51,4 @@ jobs:
             docker-compose build
             docker-compose up -d
             docker-compose ps
-            docker-compose logs backend --tail=50
+            docker-compose logs backend 
